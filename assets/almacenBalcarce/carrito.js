@@ -70,17 +70,17 @@ class Producto {
         return (this.precio - this.precio * this.descuento / 100);
     }
 
-    convertirAtexto() {
-        return convertirObjetoATexto(this);
-    }
+}
 
+function convertirAtexto(obj) {
+    return convertirObjetoATexto(obj);
 }
 
 
 function getPrecioDescuento(precio, descuento) {
     return (precio - precio * descuento / 100);
 }
-
+/*
 const snaks = new Producto(1, "Combo Snaks saludables", "assets/img/promoSnakSaludable.jpg", 850, 20);
 const vinos = new Producto(2, "Set de 5 Vinos", "assets/img/promoVinoUno.jpg", 2200, 40);
 const pollo = new Producto(3, "Pollo a las brasas más porción de papas fritas", "assets/img/promoPolloPapas.png", 1000, 15);
@@ -89,7 +89,7 @@ const fernet = new Producto(5, "Combo de Fernet más Coca-Cola", "assets/img/pro
 const sorrentinos = new Producto(6, "Sorrentinos caseros por 12 u.", "assets/img/promoSorrentinosUno.jpg", 300, 15);
 
 
-/*
+
 console.log(snaks);
 console.log("Precio con descuento: $" + snaks.getPrecioDescuento());
 console.log(vinos);
@@ -104,6 +104,7 @@ console.log(sorrentinos);
 console.log("Precio con descuento: $" + sorrentinos.getPrecioDescuento());
 */
 
+/*
 productos = [];
 productos.push(snaks);
 productos.push(vinos);
@@ -113,6 +114,8 @@ productos.push(fernet);
 productos.push(sorrentinos);
 console.log(JSON.stringify(productos));
 console.log("En total hay: " + productos.length);
+
+ */
 
 class Cliente {
     constructor(nombre, telefono, direccion) {
@@ -137,25 +140,6 @@ function ordenarPorPropiedad(array, propiedad) {
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     });
 }
-
-console.log("Ahora voy a imprimir por los productos por precio:");
-const productosOrdenadosPorPrecio = ordenarPorPropiedad(productos, "precio");
-for (var i = 0; i < productosOrdenadosPorPrecio.length; i++) {
-    console.log(productosOrdenadosPorPrecio[i].nombre + ": $ " + productosOrdenadosPorPrecio[i].precio);
-}
-
-console.log("Ahora voy a imprimir los productos ordenados por nombre:");
-const productosOrdenadosPorNombre = ordenarPorPropiedad(productos, "nombre");
-for (var i = 0; i < productosOrdenadosPorNombre.length; i++) {
-    console.log(productosOrdenadosPorNombre[i].nombre + ": $ " + productosOrdenadosPorNombre[i].precio);
-}
-
-console.log("Ahora voy a imprimir todos los productos ordenados por descuentos:");
-const productosOrdenadosPorDescuento = ordenarPorPropiedad(productos, "descuento");
-for (var i = 0; i < productosOrdenadosPorDescuento.length; i++) {
-    console.log(productosOrdenadosPorDescuento[i].nombre + ":  " + productosOrdenadosPorDescuento[i].descuento + "%");
-}
-
 
 function mostrarCarrito() {
     var pc= CARRITO.productos ;
@@ -220,12 +204,10 @@ iniciarCarrito();
 
 
 
-
-console.log(snaks.convertirAtexto());
-
 /* Agregar todos los productos al HTML de forma dinamica*/
 function mostrarProductosIndex(){
     mostrarProductos();
+    $('head').append('<script type="text/javascript" src="assets/js/main.js"></script>');
 }
 
 function mostrarProductos() {
@@ -235,8 +217,8 @@ function mostrarProductos() {
         temporal = temporal.replace("_IMAGEN_", productos[i].imagen);
         temporal = temporal.replace("_PORCENTAJE_DESCUENTO_", productos[i].descuento);
         temporal = temporal.replace("_PRECIO_", productos[i].precio);
-        temporal = temporal.replace("_PRECIO_DESCUENTO_", productos[i].getPrecioDescuento());
-        temporal = temporal.replace("_PRODUCTO_COMPLETO_", productos[i].convertirAtexto());
+        temporal = temporal.replace("_PRECIO_DESCUENTO_", getPrecioDescuento(productos[i].precio, productos[i].descuento));
+        temporal = temporal.replace("_PRODUCTO_COMPLETO_", convertirAtexto(productos[i]));
         temporal = temporal.replace("_ID_", productos[i].id)
         promociones.innerHTML = promociones.innerHTML + temporal;
     }
@@ -264,7 +246,6 @@ function readTextFile(file, callback, esParaCarrito) {
 
 
 
-readTextFile("assets/almacenBalcarce/producto.html", mostrarProductosIndex, false);
 
 function agregarAlCarrito(elemento) {
     let producto = document.getElementById(elemento).getElementsByTagName("input")[0].value;
@@ -316,8 +297,33 @@ fechaDeOferta();
 /*AJAX*/
 
 function cargarProductoConAjax(){
-    $.get( "ajax/test.html", function( data ) {
-        $( ".result" ).html( data );
-        alert( "Load was performed." );
+    $.get( "https://my-json-server.typicode.com/Lauriminotti/clase14Minotti/productos", function( data ) {
+        productos = data;
+        //alert( "Productos cargados con AJAX correctamente" );
+        readTextFile("assets/almacenBalcarce/producto.html", mostrarProductosIndex, false);
+
     });
+}
+cargarProductoConAjax();
+
+
+function mostrarProductoOrdenados(){
+
+    console.log("Ahora voy a imprimir por los productos por precio:");
+    const productosOrdenadosPorPrecio = ordenarPorPropiedad(productos, "precio");
+    for (var i = 0; i < productosOrdenadosPorPrecio.length; i++) {
+        console.log(productosOrdenadosPorPrecio[i].nombre + ": $ " + productosOrdenadosPorPrecio[i].precio);
+    }
+
+    console.log("Ahora voy a imprimir los productos ordenados por nombre:");
+    const productosOrdenadosPorNombre = ordenarPorPropiedad(productos, "nombre");
+    for (var i = 0; i < productosOrdenadosPorNombre.length; i++) {
+        console.log(productosOrdenadosPorNombre[i].nombre + ": $ " + productosOrdenadosPorNombre[i].precio);
+    }
+
+    console.log("Ahora voy a imprimir todos los productos ordenados por descuentos:");
+    const productosOrdenadosPorDescuento = ordenarPorPropiedad(productos, "descuento");
+    for (var i = 0; i < productosOrdenadosPorDescuento.length; i++) {
+        console.log(productosOrdenadosPorDescuento[i].nombre + ":  " + productosOrdenadosPorDescuento[i].descuento + "%");
+    }
 }
